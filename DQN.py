@@ -28,37 +28,7 @@ class DQNAgent(object):
         if not snakeIsDead:  # If the snake is dead, it's head would be out of the arrays bounds and give an error
             field[(s.body[0].pos[1], s.body[0].pos[0])] = 3  # Head is 3
             for part in range(1, len(s.body)):
-                field[s.body[part].pos[1], s.body[part].pos[0]] = 2  # Body is 2
-
-        if not snakeIsDead:
-            head_pos = np.argwhere(field == 3)
-            snack_pos = np.argwhere(field == 1)
-            head_snack_dist = np.linalg.norm(head_pos - snack_pos)
-
-            north_from_head_pos = np.array(head_pos)  # Redefine it as np array before setting north to it or bug
-            north_from_head_pos[0][0] = 0
-            head_north_dist = np.linalg.norm(head_pos - north_from_head_pos)  # Distance between head and north wall
-
-            east_from_head_pos = np.array(head_pos)  # Redefine it as np array before setting north to it or bug
-            east_from_head_pos[0][1] = 19
-            head_east_dist = np.linalg.norm(head_pos - east_from_head_pos)  # Distance between head and east wall
-
-            south_from_head_pos = np.array(head_pos)  # Redefine it as np array before setting north to it or bug
-            south_from_head_pos[0][0] = 19
-            head_south_dist = np.linalg.norm(head_pos - south_from_head_pos)  # Distance between head and south wall
-
-            west_from_head_pos = np.array(head_pos)  # Redefine it as np array before setting north to it or bug
-            west_from_head_pos[0][1] = 0
-            head_west_dist = np.linalg.norm(head_pos - west_from_head_pos)  # Distance between head and west wall
-
-            state = []
-            state.extend((head_snack_dist, head_north_dist, head_east_dist, head_south_dist, head_west_dist))
-            state.append(0)
-            state = [i / 20 for i in state]  # TODO Maybe this is not necessary
-            #print(state)
-        else:
-            state = state_old
-            state[5] = 1'''
+                field[s.body[part].pos[1], s.body[part].pos[0]] = 2  # Body is 2'''
 
         # print("Head", (s.body[0].pos[1], s.body[0].pos[0]))
         # print("Snack", (snack.pos[1], snack.pos[0]))
@@ -81,44 +51,15 @@ class DQNAgent(object):
             s.body[0].pos[1] > snack.pos[1],  # Snack Up
             s.body[0].pos[1] < snack.pos[1]  # Snack Down
         ]
-        '''
-        if s.body[0].dirnx == -1:  # and c.pos[0] < 0:
-            print("dirnx == -1")  # Left
-        elif s.body[0].dirnx == 1:  # and c.pos[0] > c.rows - 1:
-            print("dirnx == 1")  # Right
-        elif s.body[0].dirny == -1:  # and c.pos[1] < 0:
-            print("dirny == -1")  # Up
-        elif s.body[0].dirny == 1:  # and c.pos[1] > c.rows - 1:
-            print("dirny == 1")  # Down
-
-        if (s.body[0].dirnx == -1 and s.body[0].pos[0] < 1) or (s.body[0].dirnx == 1 and s.body[0].pos[0] > 18) \
-                or (s.body[0].dirny == 1 and s.body[0].pos[1] > 18) or (s.body[0].dirny == -1 and s.body[0].pos[1] < 1):
-            print("Danger straight")
-        elif (s.body[0].dirnx == -1 and s.body[0].pos[1] < 1) or (s.body[0].dirnx == 1 and s.body[0].pos[1] > 18) \
-                or (s.body[0].dirny == 1 and s.body[0].pos[0] < 1) or (s.body[0].dirny == -1 and s.body[0].pos[0] > 18):
-            print("Danger right")
-        elif (s.body[0].dirnx == -1 and s.body[0].pos[1] > 18) or (s.body[0].dirnx == 1 and s.body[0].pos[1] < 1) \
-                or (s.body[0].dirny == 1 and s.body[0].pos[0] > 18) or (s.body[0].dirny == -1 and s.body[0].pos[0] < 1):
-            print("Danger left")
-
-        if s.body[0].pos[0] > snack.pos[0]:
-            print("Snack Left")
-        if s.body[0].pos[0] < snack.pos[0]:
-            print("Snack Right")
-        if s.body[0].pos[1] > snack.pos[1]:
-            print("Snack Up")
-        if s.body[0].pos[1] < snack.pos[1]:
-            print("Snack Down")'''
 
         for i in range(len(new_state)):
             if new_state[i]:
                 new_state[i] = 1
             else:
                 new_state[i] = 0
-        #print(Bstate)
+        #print(new_state)
 
-        #print(state)
-        #field = [i / 3 for i in field
+        #field = [i / 3 for i in field]
 
         return np.asarray(new_state)
         # return field
