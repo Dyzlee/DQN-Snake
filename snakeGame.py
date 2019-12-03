@@ -1,8 +1,6 @@
 import random
 import pygame
 import numpy as np
-import pynput
-from pynput.keyboard import Key, Controller
 import time
 from DQN import DQNAgent
 
@@ -10,8 +8,6 @@ RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
-
-keyboard = Controller()
 
 class cube(object):
     rows = 20
