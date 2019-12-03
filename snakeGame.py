@@ -183,7 +183,7 @@ def main():
     s = snake(RED, (10, 10))
     snack = cube(randomSnack(rows, s), color=GREEN)
     agent = DQNAgent()
-    speed = 0  # 0 --> Superduperhyperfucking fast ; 10 --> Normal speed
+    speed = 0  # 0 --> Fast as fck boy ; 10 --> Normal speed
 
     pygame.init()  # Init pygame
     clock = pygame.time.Clock()
