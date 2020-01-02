@@ -18,18 +18,6 @@ class DQNAgent(object):
         self.memory = []
 
     def get_state(self, xpos, ypos, xdir, ydir, snake_block, xfood, yfood, dis_width, dis_height, snake_List):
-        """
-        Maybe first one should be:
-        (xdir < 0 and xpos == 0) or (xdir > 0 and xpos == dis_width - snake_block)
-        or (ydir > 0 and ypos == dis_height - snake_block) or (ydir < 0 and ypos == 0)
-        """
-        xi = xpos + 2 * xdir  # Coords infront of snake
-        yi = ypos + 2 * ydir  # Coords infront of snake
-        xr = xpos - ydir  # Coords right from the snake
-        yr = ypos + xdir  # Coords right from the snake
-        xl = xpos + ydir  # Coords left from the snake
-        yl = ypos - xdir  # Coords left from the snake
-
         tail_infront = False
         tail_right = False
         tail_left = False
