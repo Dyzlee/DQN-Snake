@@ -1,43 +1,63 @@
 from keras.optimizers import Adam
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Flatten
+from keras.layers.core import Dense, Dropout
 import random
 import numpy as np
-import pandas as pd
 
 class DQNAgent(object):
 
     def __init__(self):
         self.reward = 0
         self.gamma = 0.9
-        self.dataframe = pd.DataFrame()
         self.short_memory = np.array([])
-        self.agent_target = 1
-        self.agent_predict = 0
         self.learning_rate = 0.0005
         self.model = self.network()
-        self.model = self.network("weights.hdf5")
+        #self.model = self.network("weights40x40V2.hdf5")
         self.epsilon = 0
         self.actual = []
         self.memory = []
 
-    def get_state(self, xpos, ypos, xdir, ydir, snake_block, xfood, yfood, dis_width, dis_height):
+    def get_state(self, xpos, ypos, xdir, ydir, snake_block, xfood, yfood, dis_width, dis_height, snake_List):
         """
         Maybe first one should be:
         (xdir < 0 and xpos == 0) or (xdir > 0 and xpos == dis_width - snake_block)
         or (ydir > 0 and ypos == dis_height - snake_block) or (ydir < 0 and ypos == 0)
         """
+        xi = xpos + 2 * xdir  # Coords infront of snake
+        yi = ypos + 2 * ydir  # Coords infront of snake
+        xr = xpos - ydir  # Coords right from the snake
+        yr = ypos + xdir  # Coords right from the snake
+        xl = xpos + ydir  # Coords left from the snake
+        yl = ypos - xdir  # Coords left from the snake
+
+        tail_infront = False
+        tail_right = False
+        tail_left = False
+
+        try:
+            temp_save = snake_List[-2]
+            snake_List[-2] = [-66, -66]
+            if [xpos - ydir, ypos + xdir] in snake_List:
+                tail_right = True
+            if [xpos + 2 * xdir, ypos + 2 * ydir] in snake_List:
+                tail_infront = True
+            if [xpos + ydir, ypos - xdir] in snake_List:
+                tail_left = True
+            snake_List[-2] = temp_save
+        except IndexError:
+            pass
+
         state = [
             (xdir < 0 and xpos == snake_block) or (xdir > 0 and xpos == dis_width - 2*snake_block)
-            or (ydir > 0 and ypos == dis_height - 2*snake_block) or (ydir < 0 and ypos == snake_block),
+            or (ydir > 0 and ypos == dis_height - 2*snake_block) or (ydir < 0 and ypos == snake_block) or tail_infront,
             # Danger Straight
 
             (xdir < 0 and ypos == 0) or (xdir > 0 and ypos == dis_height - snake_block)
-            or (ydir > 0 and xpos == 0) or (ydir < 0 and xpos == dis_width - snake_block),
+            or (ydir > 0 and xpos == 0) or (ydir < 0 and xpos == dis_width - snake_block) or tail_right,
             # Danger Right
 
             (xdir < 0 and ypos == dis_height - snake_block) or (xdir > 0 and ypos == 0)
-            or (ydir > 0 and xpos == dis_width - snake_block) or (ydir < 0 and xpos == 0),
+            or (ydir > 0 and xpos == dis_width - snake_block) or (ydir < 0 and xpos == 0) or tail_left,
             # Danger Left
 
             xdir == -snake_block,  # Move Left

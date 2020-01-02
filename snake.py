@@ -1,7 +1,8 @@
 import pygame
-import time
 import random
+import seaborn as sns
 from random import randint
+import matplotlib.pyplot as plt
 import numpy as np
 from keras.utils import to_categorical
 from DQN import DQNAgent
@@ -24,29 +25,38 @@ score_font = pygame.font.SysFont("calibri", 12)
 
 clock = pygame.time.Clock()
 
-snake_block = 20  # The fields size is always 400 / snake_block ; snake_block = 10 => field is 40x40
-snake_speed = 10  # 0=instant speed 5=take your time 5>faster
+snake_block = 40  # The fields size is always 400 / snake_block ; 10 => 40x40 ; 20 => 20x20 ; 40 => 10x10
+snake_speed = 0  # 0=instant speed 5=take your time 5>faster
 
 def your_score(hs, score):
     value = score_font.render("Score: " + str(score) + " Highscore: " + str(hs), True, yellow)
     dis.blit(value, [0, 0])
 
-def getHighscore(highscore, score):
+def random_food(snake_List):
+    while True:
+        food = [random.randint(0, dis_width / snake_block - 1) * snake_block, random.randint(0, dis_height / snake_block - 1) * snake_block]  # Minus 1 because if the coord is 400, its out of bounds
+        if food not in snake_List:
+            return food
+
+def get_highscore(highscore, score):
     if score >= highscore:
         highscore = score
     return highscore
 
-def draw_snake(snake_block, snake_list):
-    for x in snake_list:
-        pygame.draw.rect(dis, black, [x[0], x[1], snake_block, snake_block])
+def draw_snake(sBlock, sList):
+    for x in sList:
+        pygame.draw.rect(dis, black, [x[0], x[1], sBlock, sBlock])
 
 def gameLoop():
     game_over = False
     games = 0
+    games_to_play = 300
     highscore = 0
+    score_plot = []
+    games_plot = []
     agent = DQNAgent()
 
-    while games < 300:  # Play a total of x games
+    while games < games_to_play:  # Play a total of x games
         xpos = dis_width / 2  # X Spawn point coordinate
         ypos = dis_height / 2  # Y Spawn point coordinate
 
@@ -56,14 +66,14 @@ def gameLoop():
         snake_List = []
         length_of_snake = 1
 
-        xfood = random.randint(0, dis_width / snake_block - 1) * snake_block  # Minus 1 because if the coord is 400, its out of bounds
-        yfood = random.randint(0, dis_height / snake_block - 1) * snake_block
+        food = random_food(snake_List)
+        xfood = food[0]
+        yfood = food[1]
 
         while not game_over:
             agent.epsilon = 80 - games
-            agent.epsilon = 0
 
-            state_old = agent.get_state(xpos, ypos, xdir, ydir, snake_block, xfood, yfood, dis_width, dis_height)
+            state_old = agent.get_state(xpos, ypos, xdir, ydir, snake_block, xfood, yfood, dis_width, dis_height, snake_List)
 
             if randint(0, 200) < agent.epsilon:
                 final_move = to_categorical(randint(0, 2), num_classes=3)
@@ -87,7 +97,6 @@ def gameLoop():
                 ydir = 0
             # Did Action -------------------------------------------------------------
             # Update Frame after Action ----------------------------------------------
-            '''In case this doesn't work: Try making a snake object that does all that just by a call of do_move'''
             eaten = False
             # If collide with border
             if xpos == dis_width - snake_block and xdir > 0 or xpos == 0 and xdir < 0 or ypos == dis_height - snake_block and ydir > 0 or ypos == 0 and ydir < 0:
@@ -101,41 +110,46 @@ def gameLoop():
             if len(snake_List) > length_of_snake:
                 del snake_List[0]
 
-            '''for x in snake_List[:-1]:
+            for x in snake_List[:-1]:
                 if x == snake_Head:
-                    game_over = True'''
+                    game_over = True
 
             draw_snake(snake_block, snake_List)
-            highscore = getHighscore(highscore, length_of_snake - 1)
+            highscore = get_highscore(highscore, length_of_snake - 1)
             your_score(highscore, length_of_snake - 1)
 
             if xpos == xfood and ypos == yfood:
                 eaten = True
-                xfood = random.randint(0, dis_width / snake_block - 1) * snake_block
-                yfood = random.randint(0, dis_height / snake_block - 1) * snake_block
+                food = random_food(snake_List)
+                xfood = food[0]
+                yfood = food[1]
                 length_of_snake += 1
             # Updated Frame after Action ---------------------------------------------
 
-            state_new = agent.get_state(xpos, ypos, xdir, ydir, snake_block, xfood, yfood, dis_width, dis_height)
+            state_new = agent.get_state(xpos, ypos, xdir, ydir, snake_block, xfood, yfood, dis_width, dis_height, snake_List)
             reward = agent.set_reward(game_over, eaten)
 
             agent.train_short_memory(state_old, final_move, reward, state_new, game_over)
 
             agent.remember(state_old, final_move, reward, state_new, game_over)
 
-            #print(agent.get_state(xpos, ypos, xdir, ydir, snake_block, xfood, yfood, dis_width, dis_height))
-            #print(agent.set_reward(game_over, eaten))
-
             pygame.display.update()
             clock.tick(snake_speed)
 
-        print("Game:", games, "Score:", length_of_snake - 1, "Highscore:", highscore)
+        print("Game:", games + 1, "Score:", length_of_snake - 1, "Highscore:", highscore)
         agent.replay_new(agent.memory)
         games += 1
+        score_plot.append(length_of_snake - 1)
+        games_plot.append(games)
         game_over = False
 
-    agent.model.save_weights('weights.hdf5')
+    agent.model.save_weights('weights10x10V3.hdf5')
     pygame.quit()
+    # Plot stats of game:
+    sns.set(color_codes=True)
+    ax = sns.regplot(x=games_plot, y=score_plot)
+    ax.set(xlabel='games', ylabel='score')
+    plt.show()
     quit()
 
 gameLoop()
