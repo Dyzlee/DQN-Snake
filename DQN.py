@@ -109,7 +109,7 @@ class DQNAgent(object):
             target_f = self.model.predict(np.array([state]))
             target_f[0][np.argmax(action)] = target
             self.model.fit(np.array([state]), target_f, epochs=1, verbose=0)
-
+    # TODO: Test difference between the 2 target defenitions in replay_new and trainshortmemory
     def train_short_memory(self, state, action, reward, next_state, done):
         target = reward
         if not done:
