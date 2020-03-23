@@ -95,6 +95,8 @@ class DQNAgent(object):
 
     def replay_new(self, memory):
         if len(memory) > 1000:
+            # The minibatch is a sample of all the data collected through training. Since the memory grows after time, it's contraproductive
+            # to use every sample of data from the memory as training sample. So the training data consists of max. 1000 samples.
             minibatch = random.sample(memory, 1000)
         else:
             minibatch = memory
