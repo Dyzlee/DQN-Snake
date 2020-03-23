@@ -10,7 +10,7 @@ class DQNAgent(object):
         self.reward = 0
         self.gamma = 0.9
         self.short_memory = np.array([])
-        self.learning_rate = 0.0005
+        self.learning_rate = 0.0005  # Represents the amount at which a weight is changed when the model is optimizing its parameters.
         self.model = self.network()
         #self.model = self.network("weights40x40V2.hdf5")
         self.epsilon = 0
@@ -24,6 +24,8 @@ class DQNAgent(object):
 
         try:
             temp_save = snake_List[-2]
+            # Temporarily ignore a part of the sanke. 
+            # This is made due to a bug that creates errors in the tail_infront, tail_right and tail_left variables.
             snake_List[-2] = [-66, -66]
             if [xpos - ydir, ypos + xdir] in snake_List:
                 tail_right = True
