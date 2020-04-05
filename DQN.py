@@ -105,9 +105,13 @@ class DQNAgent(object):
         for state, action, reward, next_state, done in minibatch:
             target = reward
             if not done:
+                # The target is defined as the resulting Q-Value in the best possible scenarion, following the current state and action
                 target = reward + self.gamma * np.amax(self.model.predict(np.array([next_state]))[0])
+            # target_f is a prediction for the current state. It returns several Q-Value and their corresponding action
             target_f = self.model.predict(np.array([state]))
+            # The action with the best Q-Value is replaced by the target, which is calculated to be the best scenario
             target_f[0][np.argmax(action)] = target
+            # The model is trained with the new target_f, containing the optimal Q-Value calculated with the Bellman equation
             self.model.fit(np.array([state]), target_f, epochs=1, verbose=0)
     # TODO: Test difference between the 2 target defenitions in replay_new and trainshortmemory
     def train_short_memory(self, state, action, reward, next_state, done):
