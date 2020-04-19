@@ -8,11 +8,11 @@ class DQNAgent(object):
 
     def __init__(self):
         self.reward = 0
-        self.gamma = 0.9
+        self.gamma = 0.9  # Represents the importance of future Q-Values when calculating Q(s,a)
         self.short_memory = np.array([])
         self.learning_rate = 0.0005  # Represents the amount at which a weight is changed when the model is optimizing its parameters.
         self.model = self.network()
-        #self.model = self.network("weights40x40V2.hdf5")
+        #self.model = self.network("weights40x40.hdf5")
         self.epsilon = 0
         self.actual = []
         self.memory = []
