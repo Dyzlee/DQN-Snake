@@ -104,7 +104,7 @@ class DQNAgent(object):
             minibatch = memory
         for state, action, reward, next_state, done in minibatch:
             target = reward
-            if not done:
+            if not done:  # If the game is over, then there is no future Q-Value and no need to calculate it --> so target is only reward
                 # The target is defined as the resulting Q-Value in the best possible scenario, following the current state and action
                 target = reward + self.gamma * np.amax(self.model.predict(np.array([next_state]))[0])
             # target_f is a prediction for the current state. It returns several Q-Value and their corresponding action
