@@ -72,6 +72,7 @@ def gameLoop():
 
         while not game_over:
             agent.epsilon = 80 - games
+            # agent.epsilon = 0
 
             state_old = agent.get_state(xpos, ypos, xdir, ydir, snake_block, xfood, yfood, dis_width, dis_height, snake_List)
 
