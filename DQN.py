@@ -113,7 +113,7 @@ class DQNAgent(object):
             target_f[0][np.argmax(action)] = target
             # The model is trained with the new target_f, containing the optimal Q-Value calculated with the Bellman equation
             self.model.fit(np.array([state]), target_f, epochs=1, verbose=0)
-    # TODO: Test difference between the 2 target defenitions in replay_new and trainshortmemory
+            
     def train_short_memory(self, state, action, reward, next_state, done):
         target = reward
         if not done:
